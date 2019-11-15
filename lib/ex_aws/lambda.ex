@@ -162,7 +162,7 @@ defmodule ExAws.Lambda do
   def invoke(function_name, payload, client_context, opts \\ []) do
     {qualifier, opts} = Map.pop(Enum.into(opts, %{}), :qualifier)
 
-    headers = [invocation_type: "X-Amz-Invocation-Type", log_type: "X-Amz-Log-Type"]
+    headers = [invocation_type: "X-Amz-Invocation-Type", log_type: "X-Amz-Log-Type", xray_trace_id: "X-Amzn-Trace-Id"]
     |> Enum.reduce([], fn({opt, header}, headers) ->
       case Map.fetch(opts, opt) do
         :error       -> headers
