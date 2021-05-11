@@ -1,6 +1,6 @@
 defmodule ExAws.Lambda do
   @moduledoc """
-  Operations on ExAws Lambda
+  Operations on ExAws Lambda.
   """
 
   import ExAws.Utils, only: [camelize_key: 1, camelize_keys: 1, upcase: 1]
@@ -34,7 +34,7 @@ defmodule ExAws.Lambda do
   ]
 
   @doc """
-  Adds a permission to the access policy associated with the specified AWS Lambda function
+  Adds a permission to the access policy associated with the specified AWS Lambda function.
 
   Action pattern: (lambda:[*]|lambda:[a-zA-Z]+|[*])
   """
@@ -64,7 +64,7 @@ defmodule ExAws.Lambda do
     {:enabled, boolean}
   ]
   @doc """
-  Creates a stream based event source for a function
+  Creates a stream based event source for a function.
   """
   @spec create_event_source_mapping(
     function_name     :: binary,
@@ -114,43 +114,57 @@ defmodule ExAws.Lambda do
     request(:create_function, data, "/2015-03-31/functions")
   end
 
-  @doc "Delete an event source mapping"
+  @doc """
+  Delete an event source mapping.
+  """
   @spec delete_event_source_mapping(source_mapping_uuid :: binary) :: ExAws.Operation.JSON.t
   def delete_event_source_mapping(source_mapping_uuid) do
     request(:delete_event_source_mapping, %{}, "/2015-03-31/event-source-mappings/#{source_mapping_uuid}")
   end
 
-  @doc "Delete a lambda function"
+  @doc """
+  Delete a lambda function.
+  """
   @spec delete_function(function_name :: binary) :: ExAws.Operation.JSON.t
   def delete_function(function_name) do
     request(:delete_function, %{}, "/2015-03-31/functions/#{function_name}")
   end
 
-  @doc "Get an event source mapping"
+  @doc """
+  Get an event source mapping.
+  """
   @spec get_event_source_mapping(source_mapping_uuid :: binary) :: ExAws.Operation.JSON.t
   def get_event_source_mapping(source_mapping_uuid) do
     request(:get_event_source_mapping, %{}, "/2015-03-31/event-source-mappings/#{source_mapping_uuid}")
   end
 
-  @doc "Get a function"
+  @doc """
+  Get a function.
+  """
   @spec get_function(function_name :: binary) :: ExAws.Operation.JSON.t
   def get_function(function_name) do
     request(:get_function, %{}, "/2015-03-31/functions/#{function_name}/versions/HEAD")
   end
 
-  @doc "Get a function configuration"
+  @doc """
+  Get a function configuration.
+  """
   @spec get_function_configuration(function_name :: binary) :: ExAws.Operation.JSON.t
   def get_function_configuration(function_name) do
     request(:get_function_configuration, %{}, "/2015-03-31/functions/#{function_name}/versions/HEAD/configuration")
   end
 
-  @doc "Get a function access policy"
+  @doc """
+  Get a function access policy.
+  """
   @spec get_policy(function_name :: binary) :: ExAws.Operation.JSON.t
   def get_policy(function_name) do
     request(:get_policy, %{}, "/2015-03-31/functions/#{function_name}/versions/HEAD/policy")
   end
 
-  @doc "Invoke a lambda function"
+  @doc """
+  Invoke a lambda function.
+  """
   @type invoke_opts :: [
     {:invocation_type, :event | :request_response | :dry_run} |
     {:log_type, :none | :tail} |
@@ -197,14 +211,18 @@ defmodule ExAws.Lambda do
     end)
   end
 
-  @doc "Invoke a lambda function asynchronously"
+  @doc """
+  Invoke a lambda function asynchronously.
+  """
   @spec invoke_async(function_name :: binary, args :: map()) :: ExAws.Operation.JSON.t
   def invoke_async(function_name, args) do
     Logger.info("This API is deprecated. See invoke/5 with the Event value set as invocation type")
     request(:invoke, args |> normalize_opts, "/2014-11-13/functions/#{function_name}/invoke-async/")
   end
 
-  @doc "List event source mappings"
+  @doc """
+  List event source mappings.
+  """
   @type list_event_source_mappings_opts :: [
     {:event_source_arn, binary} |
     {:function_name, binary} |
@@ -220,7 +238,9 @@ defmodule ExAws.Lambda do
     request(:list_event_source_mappings, %{}, "/2015-03-31/event-source-mappings/", params)
   end
 
-  @doc "List functions"
+  @doc """
+  List functions.
+  """
   @type list_functions_opts :: [
     {:marker, binary} |
     {:max_items, pos_integer}
@@ -231,26 +251,34 @@ defmodule ExAws.Lambda do
     request(:list_functions, %{}, "/2015-03-31/functions/", normalize_opts(opts))
   end
 
-  @doc "Remove individual permissions from an function's access policy"
+  @doc """
+  Remove individual permissions from an function's access policy.
+  """
   @spec remove_permission(function_name :: binary, statement_id :: binary) :: ExAws.Operation.JSON.t
   def remove_permission(function_name, statement_id) do
     request(:remove_permission, %{}, "/2015-03-31/functions/#{function_name}/versions/HEAD/policy/#{statement_id}")
   end
 
-  @doc "Update event source mapping"
+  @doc """
+  Update event source mapping.
+  """
   @spec update_event_source_mapping(uuid :: binary, attrs_to_update :: map()) :: ExAws.Operation.JSON.t
   def update_event_source_mapping(uuid, attrs_to_update) do
     request(:update_event_source_mapping, attrs_to_update, "/2015-03-31/event-source-mappings/#{uuid}")
   end
 
-  @doc "Update function code"
+  @doc """
+  Update function code.
+  """
   @spec update_function_code(function_name :: binary, zipfile :: binary) :: ExAws.Operation.JSON.t
   def update_function_code(function_name, zipfile) do
     data = %{"ZipFile" => zipfile}
     request(:update_function_code, data, "/2015-03-31/functions/#{function_name}/versions/HEAD/code")
   end
 
-  @doc "Update a function configuration"
+  @doc """
+  Update a function configuration.
+  """
   @spec update_function_configuration(function_name :: binary, configuration :: map()) :: ExAws.Operation.JSON.t
   def update_function_configuration(function_name, configuration) do
     data = configuration |> normalize_opts
