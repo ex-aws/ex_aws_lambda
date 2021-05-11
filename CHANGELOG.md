@@ -1,7 +1,18 @@
-v2.0.2
+# Changelog
 
-- Add trace_id as X-Amzn-Trace-Id if provided in options
+All notable changes to this project will be documented in this file.
 
-v2.0
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-- Major Project Split. Please see the main ExAws repository for previous changelogs.
+## v2.0.2 - 2020-12-22
+
+* Add `trace_id` as `X-Amzn-Trace-Id` if provided in options
+
+## v2.0.1 - 2018-11-17
+
+* Update library configuration
+
+## v2.0.0 - 2017-11-10
+
+* Major Project Split. Please see the main ExAws repository for previous changelogs.

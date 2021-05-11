@@ -16,14 +16,14 @@ defmodule ExAws.Lambda.Mixfile do
       deps: deps(),
       name: @name,
       package: package(),
-      docs: [main: @name, source_ref: "v#{@version}", source_url: @url]
+      docs: docs()
     ]
   end
 
   defp package do
     [
       description: "#{@name} service package",
-      files: ["lib", "config", "mix.exs", "README*"],
+      files: ["lib", "config", "mix.exs", "README*", "CHANGELOG*"],
       maintainers: ["Ben Wilson"],
       licenses: ["MIT"],
       links: %{github: @url}
@@ -46,8 +46,18 @@ defmodule ExAws.Lambda.Mixfile do
       {:hackney, ">= 0.0.0", only: [:dev, :test]},
       {:sweet_xml, ">= 0.0.0", only: [:dev, :test]},
       {:poison, ">= 0.0.0", only: [:dev, :test]},
-      {:ex_doc, ">= 0.0.0", only: [:dev]},
+      {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false},
       ex_aws()
+    ]
+  end
+
+  defp docs do
+    [
+      extras: ["CHANGELOG.md", "CONTRIBUTING.md", "README.md"],
+      main: "readme",
+      source_ref: "v#{@version}",
+      source_url: @url,
+      formatters: ["html"]
     ]
   end
 
