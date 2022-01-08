@@ -1,11 +1,17 @@
 # ExAws.Lambda
 
-Service module for https://github.com/ex-aws/ex_aws
+[![Module Version](https://img.shields.io/hexpm/v/ex_aws_lambda.svg)](https://hex.pm/packages/ex_aws_lambda)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/ex_aws_lambda/)
+[![Total Download](https://img.shields.io/hexpm/dt/ex_aws_lambda.svg)](https://hex.pm/packages/ex_aws_lambda)
+[![License](https://img.shields.io/hexpm/l/ex_aws_lambda.svg)](https://github.com/ex-aws/ex_aws_lambda/blob/master/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/ex-aws/ex_aws_lambda.svg)](https://github.com/ex-aws/ex_aws_lambda/commits/master)
+
+Service module for [https://github.com/ex-aws/ex_aws_lambda](https://github.com/ex-aws/ex_aws_lambda).
 
 ## Installation
 
-The package can be installed by adding `ex_aws_lambda` to your list of dependencies in `mix.exs`
-along with `:ex_aws` and your preferred JSON codec / http client
+The package can be installed by adding `:ex_aws_lambda` to your list of dependencies in `mix.exs`
+along with `:ex_aws` and your preferred JSON codec / HTTP client
 
 ```elixir
 def deps do
