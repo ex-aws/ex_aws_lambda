@@ -3,16 +3,16 @@ defmodule ExAws.LambdaTest do
 
   test "#list_functions" do
     assert %ExAws.Operation.JSON{
-      before_request: nil,
-      data: %{},
-      headers: [{"content-type", "application/json"}],
-      http_method: :get,
-      params: %{},
-      parser: _,
-      path: "/2015-03-31/functions/?",
-      service: :lambda,
-      stream_builder: nil
-    } = ExAws.Lambda.list_functions
+             before_request: nil,
+             data: %{},
+             headers: [{"content-type", "application/json"}],
+             http_method: :get,
+             params: %{},
+             parser: _,
+             path: "/2015-03-31/functions/?",
+             service: :lambda,
+             stream_builder: nil
+           } = ExAws.Lambda.list_functions()
   end
 
   describe "Lambda.invoke" do
@@ -24,24 +24,26 @@ defmodule ExAws.LambdaTest do
     end
 
     test "xray_trace_id option adds the X-Amzn-Trace-Id header" do
-      op = ExAws.Lambda.invoke("func-name", "func-payload", %{}, xray_trace_id: "1-aaaaa-bbbbbbbbb")
+      op =
+        ExAws.Lambda.invoke("func-name", "func-payload", %{}, xray_trace_id: "1-aaaaa-bbbbbbbbb")
+
       assert {"X-Amzn-Trace-Id", "1-aaaaa-bbbbbbbbb"} in op.headers
     end
 
     test "builds ExAws operation" do
       assert %ExAws.Operation.JSON{
-        before_request: _,
-        data: "func-payload",
-        headers: [
-          {"content-type", "application/json"}
-        ],
-        http_method: :post,
-        params: %{},
-        parser: _,
-        path: "/2015-03-31/functions/func-name/invocations?",
-        service: :lambda,
-        stream_builder: nil
-      } = ExAws.Lambda.invoke("func-name", "func-payload", %{})
+               before_request: _,
+               data: "func-payload",
+               headers: [
+                 {"content-type", "application/json"}
+               ],
+               http_method: :post,
+               params: %{},
+               parser: _,
+               path: "/2015-03-31/functions/func-name/invocations?",
+               service: :lambda,
+               stream_builder: nil
+             } = ExAws.Lambda.invoke("func-name", "func-payload", %{})
     end
   end
 end
