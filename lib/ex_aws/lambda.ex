@@ -23,7 +23,8 @@ defmodule ExAws.Lambda do
     remove_permission:             :delete,
     update_event_source_mapping:   :put,
     update_function_code:          :put,
-    update_function_configuration: :put
+    update_function_configuration: :put,
+    tag_resource:                  :post
   }
 
   @type starting_position_vals :: :trim_horizon | :latest
@@ -283,6 +284,20 @@ defmodule ExAws.Lambda do
   def update_function_configuration(function_name, configuration) do
     data = configuration |> normalize_opts
     request(:update_function_configuration, data, "/2015-03-31/functions/#{function_name}/configuration")
+  end
+
+  @doc """
+  Tag the Lambda resource.
+  """
+  @spec tag_resource(function_name :: binary, tags :: map()) :: ExAws.Operation.JSON.t()
+  def tag_resource(function_arn, tags) do
+    data = %{"Tags" => Map.new(tags, fn {k, v} -> {to_string(k), v} end)}
+
+    request(
+      :tag_resource,
+      data,
+      "/2017-03-31/tags/#{function_arn}"
+    )
   end
 
   defp normalize_opts(opts) do
