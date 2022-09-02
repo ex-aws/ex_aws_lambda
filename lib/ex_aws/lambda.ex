@@ -282,7 +282,7 @@ defmodule ExAws.Lambda do
   @spec update_function_configuration(function_name :: binary, configuration :: map()) :: ExAws.Operation.JSON.t
   def update_function_configuration(function_name, configuration) do
     data = configuration |> normalize_opts
-    request(:update_function_configuration, data, "/2015-03-31/functions/#{function_name}/versions/HEAD/configuration")
+    request(:update_function_configuration, data, "/2015-03-31/functions/#{function_name}/configuration")
   end
 
   defp normalize_opts(opts) do
