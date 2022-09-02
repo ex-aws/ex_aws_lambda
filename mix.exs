@@ -1,7 +1,7 @@
 defmodule ExAws.Lambda.Mixfile do
   use Mix.Project
 
-  @version "2.0.2"
+  @version "2.1.0"
   @service "lambda"
   @url "https://github.com/ex-aws/ex_aws_#{@service}"
   @name __MODULE__ |> Module.split() |> Enum.take(2) |> Enum.join(".")
@@ -24,7 +24,7 @@ defmodule ExAws.Lambda.Mixfile do
     [
       description: "#{@name} service package",
       files: ["lib", "config", "mix.exs", "README*", "CHANGELOG*"],
-      maintainers: ["Ben Wilson"],
+      maintainers: ["Bernard Duggan"],
       licenses: ["MIT"],
       links: %{github: @url}
     ]
