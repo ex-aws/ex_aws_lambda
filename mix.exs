@@ -1,7 +1,7 @@
 defmodule ExAws.Lambda.Mixfile do
   use Mix.Project
 
-  @version "2.1.0"
+  @version "2.2.0"
   @service "lambda"
   @url "https://github.com/ex-aws/ex_aws_#{@service}"
   @name __MODULE__ |> Module.split() |> Enum.take(2) |> Enum.join(".")
@@ -10,7 +10,7 @@ defmodule ExAws.Lambda.Mixfile do
     [
       app: :ex_aws_lambda,
       version: @version,
-      elixir: "~> 1.10",
+      elixir: "~> 1.11",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
