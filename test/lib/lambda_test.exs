@@ -30,7 +30,7 @@ defmodule ExAws.LambdaTest do
       assert {"X-Amzn-Trace-Id", "1-aaaaa-bbbbbbbbb"} in op.headers
     end
 
-    test "builds ExAws operation" do
+    test "builds ExAws JSON operation" do
       assert %ExAws.Operation.JSON{
                before_request: _,
                data: "func-payload",
@@ -44,6 +44,19 @@ defmodule ExAws.LambdaTest do
                service: :lambda,
                stream_builder: nil
              } = ExAws.Lambda.invoke("func-name", "func-payload", %{})
+    end
+
+    test "builds ExAws RestQuery operation" do
+      assert %ExAws.Operation.RestQuery{
+               body: "func-payload",
+               http_method: :post,
+               params: %{},
+               parser: parser_func,
+               path: "/2015-03-31/functions/func-name/invocations?",
+               service: :lambda
+             } = ExAws.Lambda.invoke("func-name", "func-payload", %{}, parser: &{&1, &2})
+
+      assert is_function(parser_func, 2)
     end
   end
 end

@@ -197,6 +197,7 @@ defmodule ExAws.Lambda do
           {:invocation_type, :event | :request_response | :dry_run}
           | {:log_type, :none | :tail}
           | {:qualifier, String.t()}
+          | {:parser, fun()}
         ]
   @spec invoke(function_name :: binary, payload :: map(), client_context :: map()) ::
           ExAws.Operation.JSON.t()
@@ -205,7 +206,7 @@ defmodule ExAws.Lambda do
           payload :: map(),
           client_context :: map(),
           opts :: invoke_opts
-        ) :: ExAws.Operation.JSON.t()
+        ) :: ExAws.Operation.JSON.t() | ExAws.Operation.RestQuery.t()
   @context_header "X-Amz-Client-Context"
   def invoke(function_name, payload, client_context, opts \\ []) do
     {qualifier, opts} = Map.pop(Enum.into(opts, %{}), :qualifier)
@@ -236,21 +237,29 @@ defmodule ExAws.Lambda do
     url = "/2015-03-31/functions/#{function_name}/invocations"
     url = if qualifier, do: url <> "?Qualifier=#{qualifier}", else: url
 
-    request(:invoke, payload, url, [], headers, fn operation, config ->
-      headers =
-        operation.headers
-        |> List.keyfind(@context_header, 0, nil)
-        |> case do
-          nil ->
-            operation.headers
+    request(
+      :invoke,
+      payload,
+      url,
+      [],
+      headers,
+      fn operation, config ->
+        headers =
+          operation.headers
+          |> List.keyfind(@context_header, 0, nil)
+          |> case do
+            nil ->
+              operation.headers
 
-          {_, val} ->
-            new_val = val |> config.json_codec.encode! |> Base.encode64()
-            List.keyreplace(operation.headers, @context_header, 0, {@context_header, new_val})
-        end
+            {_, val} ->
+              new_val = val |> config.json_codec.encode! |> Base.encode64()
+              List.keyreplace(operation.headers, @context_header, 0, {@context_header, new_val})
+          end
 
-      %{operation | headers: headers}
-    end)
+        %{operation | headers: headers}
+      end,
+      Map.get(opts, :parser, nil)
+    )
   end
 
   @doc """
@@ -378,7 +387,31 @@ defmodule ExAws.Lambda do
     |> camelize_keys
   end
 
-  defp request(action, data, path, params \\ [], headers \\ [], before_request \\ nil) do
+  defp request(
+         action,
+         data,
+         path,
+         params \\ [],
+         headers \\ [],
+         before_request \\ nil,
+         parser \\ nil
+       )
+
+  defp request(action, data, path, params, _headers, _before_request, parser)
+       when is_function(parser, 2) and not is_nil(parser) do
+    path = [path, "?", params |> URI.encode_query()] |> IO.iodata_to_binary()
+    http_method = @actions |> Map.fetch!(action)
+
+    %ExAws.Operation.RestQuery{
+      service: :lambda,
+      http_method: http_method,
+      path: path,
+      body: data,
+      parser: parser
+    }
+  end
+
+  defp request(action, data, path, params, headers, before_request, _) do
     path = [path, "?", params |> URI.encode_query()] |> IO.iodata_to_binary()
     http_method = @actions |> Map.fetch!(action)
 
