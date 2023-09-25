@@ -237,21 +237,29 @@ defmodule ExAws.Lambda do
     url = "/2015-03-31/functions/#{function_name}/invocations"
     url = if qualifier, do: url <> "?Qualifier=#{qualifier}", else: url
 
-    request(:invoke, payload, url, [], headers, fn operation, config ->
-      headers =
-        operation.headers
-        |> List.keyfind(@context_header, 0, nil)
-        |> case do
-          nil ->
-            operation.headers
+    request(
+      :invoke,
+      payload,
+      url,
+      [],
+      headers,
+      fn operation, config ->
+        headers =
+          operation.headers
+          |> List.keyfind(@context_header, 0, nil)
+          |> case do
+            nil ->
+              operation.headers
 
-          {_, val} ->
-            new_val = val |> config.json_codec.encode! |> Base.encode64()
-            List.keyreplace(operation.headers, @context_header, 0, {@context_header, new_val})
-        end
+            {_, val} ->
+              new_val = val |> config.json_codec.encode! |> Base.encode64()
+              List.keyreplace(operation.headers, @context_header, 0, {@context_header, new_val})
+          end
 
-      %{operation | headers: headers}
-    end, Map.get(opts, :parser, nil))
+        %{operation | headers: headers}
+      end,
+      Map.get(opts, :parser, nil)
+    )
   end
 
   @doc """
@@ -379,8 +387,18 @@ defmodule ExAws.Lambda do
     |> camelize_keys
   end
 
-  defp request(action, data, path, params \\ [], headers \\ [], before_request \\ nil, parser \\ nil)
-  defp request(action, data, path, params, _headers, _before_request, parser) when is_function(parser, 2) and not is_nil(parser) do
+  defp request(
+         action,
+         data,
+         path,
+         params \\ [],
+         headers \\ [],
+         before_request \\ nil,
+         parser \\ nil
+       )
+
+  defp request(action, data, path, params, _headers, _before_request, parser)
+       when is_function(parser, 2) and not is_nil(parser) do
     path = [path, "?", params |> URI.encode_query()] |> IO.iodata_to_binary()
     http_method = @actions |> Map.fetch!(action)
 

@@ -48,13 +48,14 @@ defmodule ExAws.LambdaTest do
 
     test "builds ExAws RestQuery operation" do
       assert %ExAws.Operation.RestQuery{
-            body: "func-payload",
-            http_method: :post,
-            params: %{},
-            parser: parser_func,
-            path: "/2015-03-31/functions/func-name/invocations?",
-            service: :lambda,
-          } = ExAws.Lambda.invoke("func-name", "func-payload", %{}, parser: & ({&1, &2}))
+               body: "func-payload",
+               http_method: :post,
+               params: %{},
+               parser: parser_func,
+               path: "/2015-03-31/functions/func-name/invocations?",
+               service: :lambda
+             } = ExAws.Lambda.invoke("func-name", "func-payload", %{}, parser: &{&1, &2})
+
       assert is_function(parser_func, 2)
     end
   end
