@@ -124,7 +124,7 @@ defmodule ExAws.Lambda do
   def create_function(function_name, handler, zipfile_or_container_uri, opts \\ []) do
     code =
       if opts[:package_type] == "Image" do
-        %{"Code" => %{"ImageURI" => zipfile_or_container_uri}}
+        %{"Code" => %{"ImageUri" => zipfile_or_container_uri}}
       else
         %{"Code" => %{"ZipFile" => zipfile_or_container_uri}, "Handler" => handler}
       end
