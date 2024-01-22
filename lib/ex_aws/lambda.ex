@@ -133,7 +133,7 @@ defmodule ExAws.Lambda do
       opts
       |> normalize_opts
       |> Map.merge(%{
-        "FunctionName" => function_name,
+        "FunctionName" => function_name
       })
       |> Map.merge(code)
 
