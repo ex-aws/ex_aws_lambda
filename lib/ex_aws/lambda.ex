@@ -105,27 +105,37 @@ defmodule ExAws.Lambda do
   Create a function.
 
   Runtime defaults to nodejs, as that is the only one available.
+
+  If options contains `package_type`, then if that is "Image" the function creates
+  a container function; else it will create a zipfile-based function. For a container,
+  the `handler` argument will be ignored.
   """
   @spec create_function(
           function_name :: binary,
           handler :: binary,
-          zipfile :: binary
+          zipfile_or_container_uri :: binary
         ) :: ExAws.Operation.JSON.t()
   @spec create_function(
           function_name :: binary,
           handler :: binary,
-          zipfile :: binary,
+          zipfile_or_container_uri :: binary,
           opts :: create_function_opts
         ) :: ExAws.Operation.JSON.t()
-  def create_function(function_name, handler, zipfile, opts \\ []) do
+  def create_function(function_name, handler, zipfile_or_container_uri, opts \\ []) do
+    code =
+      if opts[:package_type] == "Image" do
+        %{"Code" => %{"ImageUri" => zipfile_or_container_uri}}
+      else
+        %{"Code" => %{"ZipFile" => zipfile_or_container_uri}, "Handler" => handler}
+      end
+
     data =
       opts
       |> normalize_opts
       |> Map.merge(%{
-        "FunctionName" => function_name,
-        "Handler" => handler,
-        "Code" => %{"ZipFile" => zipfile}
+        "FunctionName" => function_name
       })
+      |> Map.merge(code)
 
     request(:create_function, data, "/2015-03-31/functions")
   end
