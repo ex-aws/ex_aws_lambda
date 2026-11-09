@@ -62,7 +62,11 @@ defmodule ExAws.Lambda do
         "StatementId" => statement_id
       })
 
-    request(:add_permission, data, "/2015-03-31/functions/#{function_name}/versions/HEAD/policy")
+    request(
+      :add_permission,
+      data,
+      "/2015-03-31/functions/#{encode_segment(function_name)}/versions/HEAD/policy"
+    )
   end
 
   @type create_event_source_mapping_opts :: [
@@ -148,7 +152,7 @@ defmodule ExAws.Lambda do
     request(
       :delete_event_source_mapping,
       %{},
-      "/2015-03-31/event-source-mappings/#{source_mapping_uuid}"
+      "/2015-03-31/event-source-mappings/#{encode_segment(source_mapping_uuid)}"
     )
   end
 
@@ -157,7 +161,7 @@ defmodule ExAws.Lambda do
   """
   @spec delete_function(function_name :: binary) :: ExAws.Operation.JSON.t()
   def delete_function(function_name) do
-    request(:delete_function, %{}, "/2015-03-31/functions/#{function_name}")
+    request(:delete_function, %{}, "/2015-03-31/functions/#{encode_segment(function_name)}")
   end
 
   @doc """
@@ -168,7 +172,7 @@ defmodule ExAws.Lambda do
     request(
       :get_event_source_mapping,
       %{},
-      "/2015-03-31/event-source-mappings/#{source_mapping_uuid}"
+      "/2015-03-31/event-source-mappings/#{encode_segment(source_mapping_uuid)}"
     )
   end
 
@@ -177,7 +181,11 @@ defmodule ExAws.Lambda do
   """
   @spec get_function(function_name :: binary) :: ExAws.Operation.JSON.t()
   def get_function(function_name) do
-    request(:get_function, %{}, "/2015-03-31/functions/#{function_name}/versions/HEAD")
+    request(
+      :get_function,
+      %{},
+      "/2015-03-31/functions/#{encode_segment(function_name)}/versions/HEAD"
+    )
   end
 
   @doc """
@@ -188,7 +196,7 @@ defmodule ExAws.Lambda do
     request(
       :get_function_configuration,
       %{},
-      "/2015-03-31/functions/#{function_name}/versions/HEAD/configuration"
+      "/2015-03-31/functions/#{encode_segment(function_name)}/versions/HEAD/configuration"
     )
   end
 
@@ -197,7 +205,11 @@ defmodule ExAws.Lambda do
   """
   @spec get_policy(function_name :: binary) :: ExAws.Operation.JSON.t()
   def get_policy(function_name) do
-    request(:get_policy, %{}, "/2015-03-31/functions/#{function_name}/versions/HEAD/policy")
+    request(
+      :get_policy,
+      %{},
+      "/2015-03-31/functions/#{encode_segment(function_name)}/versions/HEAD/policy"
+    )
   end
 
   @doc """
@@ -244,14 +256,13 @@ defmodule ExAws.Lambda do
           [{@context_header, context} | headers]
       end
 
-    url = "/2015-03-31/functions/#{function_name}/invocations"
-    url = if qualifier, do: url <> "?Qualifier=#{qualifier}", else: url
+    params = if qualifier, do: [Qualifier: qualifier], else: []
 
     request(
       :invoke,
       payload,
-      url,
-      [],
+      "/2015-03-31/functions/#{encode_segment(function_name)}/invocations",
+      params,
       headers,
       fn operation, config ->
         headers =
@@ -284,7 +295,7 @@ defmodule ExAws.Lambda do
     request(
       :invoke,
       args |> normalize_opts,
-      "/2014-11-13/functions/#{function_name}/invoke-async/"
+      "/2014-11-13/functions/#{encode_segment(function_name)}/invoke-async/"
     )
   end
 
@@ -330,7 +341,7 @@ defmodule ExAws.Lambda do
     request(
       :remove_permission,
       %{},
-      "/2015-03-31/functions/#{function_name}/versions/HEAD/policy/#{statement_id}"
+      "/2015-03-31/functions/#{encode_segment(function_name)}/versions/HEAD/policy/#{encode_segment(statement_id)}"
     )
   end
 
@@ -343,7 +354,7 @@ defmodule ExAws.Lambda do
     request(
       :update_event_source_mapping,
       attrs_to_update,
-      "/2015-03-31/event-source-mappings/#{uuid}"
+      "/2015-03-31/event-source-mappings/#{encode_segment(uuid)}"
     )
   end
 
@@ -358,7 +369,7 @@ defmodule ExAws.Lambda do
     request(
       :update_function_code,
       data,
-      "/2015-03-31/functions/#{function_name}/versions/HEAD/code"
+      "/2015-03-31/functions/#{encode_segment(function_name)}/versions/HEAD/code"
     )
   end
 
@@ -373,7 +384,7 @@ defmodule ExAws.Lambda do
     request(
       :update_function_configuration,
       data,
-      "/2015-03-31/functions/#{function_name}/configuration"
+      "/2015-03-31/functions/#{encode_segment(function_name)}/configuration"
     )
   end
 
@@ -387,8 +398,24 @@ defmodule ExAws.Lambda do
     request(
       :tag_resource,
       data,
-      "/2017-03-31/tags/#{function_arn}"
+      "/2017-03-31/tags/#{encode_segment(function_arn)}"
     )
+  end
+
+  # Percent-encodes a caller-supplied identifier (function name, ARN, UUID,
+  # statement ID) so that it always occupies exactly one path segment.
+  #
+  # Everything outside the RFC 3986 unreserved set is encoded, including "/",
+  # "?", "#" and ":", which is what the official AWS SDKs do for REST path
+  # labels. Lambda decodes the segment before resolving the resource, and SigV4
+  # double-encodes it in the canonical request, so a request built this way
+  # still verifies. Without this, an identifier containing path or query
+  # metacharacters could change which resource or operation the request hits
+  # (GHSA-rxg9-76jv-f68p).
+  defp encode_segment(segment) do
+    segment
+    |> to_string()
+    |> URI.encode(&URI.char_unreserved?/1)
   end
 
   defp normalize_opts(opts) do

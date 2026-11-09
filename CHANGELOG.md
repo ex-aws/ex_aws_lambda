@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.2.0
 * BREAKING: Bump minimum elixir version to 1.11
+* Security: percent-encode caller-supplied identifiers (function names, ARNs, UUIDs,
+  statement IDs) when building request paths, and send the `invoke` `Qualifier` as an
+  encoded query parameter. Identifiers containing `/`, `?`, `#` or other metacharacters
+  can no longer change which resource or operation a request targets (GHSA-rxg9-76jv-f68p)
 
 ## v2.1.0 - 2022-09-02
 
