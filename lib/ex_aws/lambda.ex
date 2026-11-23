@@ -403,19 +403,34 @@ defmodule ExAws.Lambda do
   end
 
   # Percent-encodes a caller-supplied identifier (function name, ARN, UUID,
-  # statement ID) so that it always occupies exactly one path segment.
+  # statement ID) so that it always occupies exactly one path segment. This is
+  # what the official AWS SDKs do for REST path labels. Lambda decodes the
+  # segment before resolving the resource, and SigV4 double-encodes it in the
+  # canonical request, so a request built this way still verifies. Without
+  # this, an identifier containing path or query metacharacters could change
+  # which resource or operation the request hits (GHSA-rxg9-76jv-f68p).
   #
-  # Everything outside the RFC 3986 unreserved set is encoded, including "/",
-  # "?", "#" and ":", which is what the official AWS SDKs do for REST path
-  # labels. Lambda decodes the segment before resolving the resource, and SigV4
-  # double-encodes it in the canonical request, so a request built this way
-  # still verifies. Without this, an identifier containing path or query
-  # metacharacters could change which resource or operation the request hits
-  # (GHSA-rxg9-76jv-f68p).
+  # The encoding itself is `ExAws.Request.Url.encode_path_segment/1`, which is
+  # shared by the ex_aws service libraries: everything outside the RFC 3986
+  # unreserved set is encoded, including "/", "?", "#" and ":", and so are the
+  # dot segments "." and "..".
+  #
+  # ex_aws releases that predate that function are still supported, so it is
+  # called only when it exists and the same encoding is done here otherwise.
+  # Once the ex_aws requirement in mix.exs is raised to a release that has it,
+  # the fallback (and `apply/3`, which is only there to keep the compiler from
+  # warning about a function older releases lack) can go.
   defp encode_segment(segment) do
-    segment
-    |> to_string()
-    |> URI.encode(&URI.char_unreserved?/1)
+    if Code.ensure_loaded?(ExAws.Request.Url) and
+         function_exported?(ExAws.Request.Url, :encode_path_segment, 1) do
+      apply(ExAws.Request.Url, :encode_path_segment, [segment])
+    else
+      case to_string(segment) do
+        "." -> "%2E"
+        ".." -> "%2E%2E"
+        string -> URI.encode(string, &URI.char_unreserved?/1)
+      end
+    end
   end
 
   defp normalize_opts(opts) do

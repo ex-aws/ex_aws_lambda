@@ -73,6 +73,21 @@ defmodule ExAws.LambdaTest do
                "/2015-03-31/functions/tenant-a-fn%2F..%2Fvictim-fn?"
     end
 
+    test "an identifier that is a dot segment is encoded" do
+      assert ExAws.Lambda.delete_function("..").path == "/2015-03-31/functions/%2E%2E?"
+      assert ExAws.Lambda.get_function(".").path == "/2015-03-31/functions/%2E/versions/HEAD?"
+
+      assert ExAws.Lambda.remove_permission("..", "..").path ==
+               "/2015-03-31/functions/%2E%2E/versions/HEAD/policy/%2E%2E?"
+
+      assert ExAws.Lambda.delete_event_source_mapping("..").path ==
+               "/2015-03-31/event-source-mappings/%2E%2E?"
+
+      # only a whole segment counts: dots inside a name are left alone
+      assert ExAws.Lambda.delete_function("my.fn..v1").path ==
+               "/2015-03-31/functions/my.fn..v1?"
+    end
+
     test "query and fragment metacharacters cannot alter the request" do
       assert ExAws.Lambda.delete_function("my-fn?Qualifier=5").path ==
                "/2015-03-31/functions/my-fn%3FQualifier%3D5?"
