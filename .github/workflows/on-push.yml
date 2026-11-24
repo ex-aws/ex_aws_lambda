@@ -11,7 +11,7 @@ jobs:
       matrix:
         # Supported pairs per
         # https://hexdocs.pm/elixir/compatibility-and-deprecations.html
-        otp: [24.x, 25.x, 26.x, 27.x, 28.x, 29.x]
+        otp: [25.x, 26.x, 27.x, 28.x, 29.x]
         elixir: [1.16.x, 1.17.x, 1.18.x, 1.19.x, 1.20.x]
         exclude:
           # 1.16 supports OTP 24-26
@@ -19,18 +19,14 @@ jobs:
           - {elixir: 1.16.x, otp: 28.x}
           - {elixir: 1.16.x, otp: 29.x}
           # 1.17 and 1.18 support OTP 25-27
-          - {elixir: 1.17.x, otp: 24.x}
           - {elixir: 1.17.x, otp: 28.x}
           - {elixir: 1.17.x, otp: 29.x}
-          - {elixir: 1.18.x, otp: 24.x}
           - {elixir: 1.18.x, otp: 28.x}
           - {elixir: 1.18.x, otp: 29.x}
           # 1.19 supports OTP 26-28
-          - {elixir: 1.19.x, otp: 24.x}
           - {elixir: 1.19.x, otp: 25.x}
           - {elixir: 1.19.x, otp: 29.x}
           # 1.20 supports OTP 27-29
-          - {elixir: 1.20.x, otp: 24.x}
           - {elixir: 1.20.x, otp: 25.x}
           - {elixir: 1.20.x, otp: 26.x}
     steps:
