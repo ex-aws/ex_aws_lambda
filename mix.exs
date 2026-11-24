@@ -10,7 +10,7 @@ defmodule ExAws.Lambda.Mixfile do
     [
       app: :ex_aws_lambda,
       version: @version,
-      elixir: "~> 1.16",
+      elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
