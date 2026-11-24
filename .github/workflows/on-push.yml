@@ -6,18 +6,33 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [23.x, 24.x, 25.x]
-        elixir: [1.11.x, 1.12.x, 1.13.x, 1.14.x, 1.15.x]
+        # Supported pairs per
+        # https://hexdocs.pm/elixir/compatibility-and-deprecations.html
+        otp: [24.x, 25.x, 26.x, 27.x, 28.x, 29.x]
+        elixir: [1.16.x, 1.17.x, 1.18.x, 1.19.x, 1.20.x]
         exclude:
-          - otp: 25.x
-            elixir: 1.11.x
-          - otp: 25.x
-            elixir: 1.12.x
-          - otp: 23.x
-            elixir: 1.15.x
+          # 1.16 supports OTP 24-26
+          - {elixir: 1.16.x, otp: 27.x}
+          - {elixir: 1.16.x, otp: 28.x}
+          - {elixir: 1.16.x, otp: 29.x}
+          # 1.17 and 1.18 support OTP 25-27
+          - {elixir: 1.17.x, otp: 24.x}
+          - {elixir: 1.17.x, otp: 28.x}
+          - {elixir: 1.17.x, otp: 29.x}
+          - {elixir: 1.18.x, otp: 24.x}
+          - {elixir: 1.18.x, otp: 28.x}
+          - {elixir: 1.18.x, otp: 29.x}
+          # 1.19 supports OTP 26-28
+          - {elixir: 1.19.x, otp: 24.x}
+          - {elixir: 1.19.x, otp: 25.x}
+          - {elixir: 1.19.x, otp: 29.x}
+          # 1.20 supports OTP 27-29
+          - {elixir: 1.20.x, otp: 24.x}
+          - {elixir: 1.20.x, otp: 25.x}
+          - {elixir: 1.20.x, otp: 26.x}
     steps:
       - uses: actions/checkout@v2
       - uses: erlef/setup-beam@v1
@@ -27,7 +42,7 @@ jobs:
       - run: mix deps.get
       - run: mix compile
       - run: mix format --check-formatted
-        if: matrix.elixir == '1.15.x' # Only check formatting with the latest verison
+        if: matrix.elixir == '1.20.x' # Only check formatting with the latest verison
       - run: mix dialyzer
-        if: matrix.elixir == '1.15.x'
+        if: matrix.elixir == '1.20.x'
       - run: mix test
